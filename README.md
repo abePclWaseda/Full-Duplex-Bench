@@ -1,5 +1,5 @@
 # Full-Duplex-Bench: A Benchmark to Evaluate Full-duplex Spoken Dialogue Models on Turn-taking Capabilities
-> Authors: Guan-Ting Lin, Jiachen Lian*, Tingle Li*, Qirui Wang*, Gopala Anumanchipalli, Alexander H. Liu, Hung-yi Lee
+> Authors: [Guan-Ting Lin](https://daniellin94144.github.io/), [Jiachen Lian*](https://jlian2.github.io/), [Tingle Li*](https://tinglok.netlify.app/), [Qirui Wang*](https://www.linkedin.com/in/qrw-160509207/), [Gopala Anumanchipalli](https://www2.eecs.berkeley.edu/Faculty/Homepages/gopala.html), [Alexander H. Liu](https://alexander-h-liu.github.io/), [Hung-yi Lee](https://speech.ee.ntu.edu.tw/~hylee/index.html)
 
 ## TL;DR
 A benchmark to evaluate full-duplex spoken dialogue models on pause handling, backchanneling, turn-taking, and user interruptions.
@@ -19,23 +19,38 @@ Full-Duplex-Bench provides an open and standardized benchmark to assess these in
 - **Smooth Turn-Taking:** Assesses response timing to ensure fluid dialogue transitions.
 - **User Interruption Management:** Tests a model's ability to adapt to user interruptions and shift focus appropriately.
 
-We will provide a set of curated datasets, automatic evaluation scripts, and baseline results on multiple state-of-the-art full-duplex models in upcoming releases. Our benchmark aims to drive progress in spoken dialogue systems by encouraging fair and open evaluation practices. 
+<div align="center"><img src="https://github.com/user-attachments/assets/e936d330-1105-42fc-b5c6-d7ee8f40d27c" width="65%"/></div>
+
+We will provide a set of curated datasets, automatic evaluation scripts, and baseline results on multiple full-duplex models in upcoming releases. Our benchmark aims to drive progress in spoken dialogue systems by encouraging fair and open evaluation practices. 
 
 The audio demo samples can be found in [[Demo]](https://full-duplex-bench.github.io/).
 
 ## Timeline ⏱
-- **Dataset Release:** Coming soon ⏳
-- **Codebase and Evaluation Framework:** Coming soon ⏳
-- **Expanded Model Evaluations & Community Contributions:** Ongoing 🚀
+- **(2025/4/30) Dataset Release:** ✅ see under the `dataset` folder
+- **(2025/4/30) Evaluation Codebase:** ✅ see under the `evaluation` folder
+- **(Ongoing) Expanded Model Evaluations & Community Contributions**
 
 Stay tuned for upcoming releases!
 
 ## Getting Started 🏁
 ### Installation
-The repository and installation instructions will be available upon release.
+```
+conda create -n full-duplex-bench python=3.8
+conda activate full-duplex-bench
+pip install -r requirements.txt
+```
 
-### Running Evaluations
-Evaluation scripts and datasets will be made available in the upcoming release.
+### Step-by-step Instruction
+#### 1. Model Inference
+The goal of model inference is to let the model generate the time-synchronous `output.wav` given the audio stream of user speech (`input.wav`). You can use you own model to generate the output speech for evaluation.
+
+Currently, the model inference is not included in the repository. We will provide the inference code soon.
+
+#### 2. Prepare for Evaluation with time-aligned transcription
+Under `get_transcript` folder, you can find `asr.py` to obtain the time-aligned transcription for the model generated audio. For more details please see the readme in the folder.
+
+#### 3. Running Evaluations
+Under `evaluation` folder, please see the readme file in the folder for detailed instruction to run the evaluation for each tasks.
 
 ## Citation 📖
 If you have any questions, please feel free to submit an issue or contact Guan-Ting Lin (daniel094144@gmail.com)

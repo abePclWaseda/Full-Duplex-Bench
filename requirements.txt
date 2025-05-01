@@ -1,0 +1,15 @@
+cryptography
+datasets
+flask
+flask_socketio
+numpy
+openai
+scipy
+silero_vad
+soundfile
+torch
+torchaudio
+tqdm
+transformers
+pyyaml
+accelerate>=0.26.0
