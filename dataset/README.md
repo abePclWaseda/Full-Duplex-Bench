@@ -8,8 +8,8 @@ You can download the dataset from the following Google Drive link: [Dataset Down
 
 | Dataset     | Task                  | # of Samples |
 |-------------|------------------------|--------------|
-| CANDAR      | Pause Handling         | 216          |
-| CANDAR      | Smooth Turn-Taking     | 119          |
+| Candor      | Pause Handling         | 216          |
+| Candor      | Smooth Turn-Taking     | 119          |
 | ICC         | Backchannel            | 55           |
 | Synthetic   | User Interruption      | 200          |
 | Synthetic   | Pause Handling         | 137          |
