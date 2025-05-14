@@ -7,7 +7,8 @@ An ASR script is provided to process the audio outputs. Ensure your data follows
 ### Note
 Due to the potential Whisper version mismatch in [transformers](https://github.com/huggingface/transformers), we recommend reinstalling it as follows:
 ``` bash
-pip install git+https://github.com/DanielLin94144/Full-Duplex-Bench.git#subdirectory=get_transcript/transformers
+chmod +x run_patch.sh
+bash run_patch.sh
 ```
 
 ### Running ASR
