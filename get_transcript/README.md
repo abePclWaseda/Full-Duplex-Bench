@@ -5,7 +5,7 @@ An ASR script is provided to process the audio outputs. Ensure your data follows
 ```
 
 ### Note
-Due to the potential Whisper version mismatch in [transformers](https://github.com/huggingface/transformers), we recommend reinstalling it as follows:
+Due to a potential Whisper version mismatch [issue](https://github.com/nyrahealth/CrisperWhisper/issues/4) in [transformers](https://github.com/huggingface/transformers), we recommend reinstalling it as follows:
 ``` bash
 chmod +x run_patch.sh
 bash run_patch.sh
