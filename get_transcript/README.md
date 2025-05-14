@@ -16,9 +16,11 @@ bash run_patch.sh
 Use the following command to run the ASR script:
 
 ```bash
-python asr.py --root_dir {OUTPUT_WAV_ROOT_PATH}
+python asr.py --root_dir {OUTPUT_WAV_ROOT_PATH} --task {TASK_NAME}
 ```
 
-Replace `{OUTPUT_WAV_ROOT_PATH}` with the actual root path containing your output WAV files.
+- Replace `{OUTPUT_WAV_ROOT_PATH}` with the actual root path containing your output WAV files.
+- Replace `{TASK_NAME}` with one of `backchannel`, `pause_handling`, `smooth_turn_taking`, and `user_interruption`.
+
 
 Note that in the `asr.py` file, you have to specify your huggingface API key in the beginning of the python file.
