@@ -117,7 +117,7 @@ def eval_backchannel(data_dir):
         print(f"backchannel prediction is {backchannel_prediction}")
 
         TOR_list.append(TOR)
-        max_end_time = len(wav) / sr
+        max_end_time = wav.shape[-1] / sr
         freq_list.append(len(backchannel_prediction) / max_end_time)
 
         if len(backchannel_prediction) == 0:
