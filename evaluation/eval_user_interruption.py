@@ -83,9 +83,9 @@ def eval_user_interruption(root_dir, client):
             metadata = json.load(f)
             metadata = metadata[0]
 
-        in_interrupt_text = metadata["interrupt"]
-        in_before_interrupt_text = metadata["context"]
-        input_end_time = metadata["timestamp"][1]
+        in_interrupt_text = metadata[0]["interrupt"]
+        in_before_interrupt_text = metadata[0]["context"]
+        input_end_time = metadata[0]["timestamp"][1]
         out_after_interrupt_text = out_after_interrupt["text"]
 
         user_msg = f"""
