@@ -4,6 +4,12 @@ An ASR script is provided to process the audio outputs. Ensure your data follows
 {OUTPUT_WAV_ROOT_PATH}/{ID}/output.wav
 ```
 
+### Note
+Due to a potential Whisper version mismatch in [transformers](https://github.com/huggingface/transformers), we recommend reinstalling it as follows:
+``` bash
+pip install git+https://github.com/DanielLin94144/Full-Duplex-Bench.git#subdirectory=get_transcript/transformers
+```
+
 ### Running ASR
 
 Use the following command to run the ASR script:
