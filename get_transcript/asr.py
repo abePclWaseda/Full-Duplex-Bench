@@ -57,29 +57,37 @@ def get_time_aligned_transcription(data_path, task):
     dataset = dataset.map(load_audio, num_proc=4)
 
     # Build the DataLoader for batching
-    dataloader = DataLoader(dataset, batch_size=1, num_workers=1, collate_fn=collate_fn)
+    dataloader = DataLoader(dataset, batch_size=1, num_workers=1, collate_fn=collate_fn, shuffle=False)
 
     # Process the dataset in batches
     for pipeline_inputs, metadata in tqdm(dataloader):
         try:
             if task == "user_interruption":
                 # read the interrupt.json file
-                metadata_path = pipeline_inputs["audio_path"].replace(
+                metadata_path = metadata[0].replace(
                     "output.wav", "interrupt.json"
                 )
                 # read the json file
                 with open(metadata_path, "r") as f:
-                    metadata = json.load(f)
-                timestamps = metadata["timestamps"]
+                    interrupt_metadata = json.load(f)
+                timestamps = interrupt_metadata[0]["timestamp"]
                 end_interrupt = timestamps[1]
-                end_interrupt_idx = int(end_interrupt * 16000)
+                end_interrupt_idx = int(end_interrupt * pipeline_inputs[0]["sampling_rate"])
 
                 # truncate the audio to the start_interrupt till the end
-                pipeline_inputs["array"] = pipeline_inputs["array"][end_interrupt_idx:]
+                pipeline_inputs[0]["array"] = pipeline_inputs[0]["array"][end_interrupt_idx:]
 
-                # pipeline_inputs['array'] =
             # The pipeline now receives a list of dictionaries with only the required keys
             hf_pipeline_outputs = pipe(pipeline_inputs)
+
+            # If we did a user interruption, shift all returned timestamps by the offset
+            if task == "user_interruption":
+                for out in hf_pipeline_outputs:
+                    # shift each word‐level timestamp back to the original timeline
+                    for chunk in out.get("chunks", []):
+                        start, end = chunk["timestamp"]
+                        chunk["timestamp"] = (start + end_interrupt, end + end_interrupt)
+
             # Iterate over outputs and corresponding metadata to save results
             for audio_path, output in zip(metadata, hf_pipeline_outputs):
                 crisper_whisper_result = adjust_pauses_for_hf_pipeline_output(output)
