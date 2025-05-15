@@ -67,10 +67,17 @@ def eval_user_interruption(root_dir, client):
         print(f"Processing {file_dir} ...")
 
         out_after_interrupt_path = os.path.join(file_dir, "output.json")
+        # check must have output.json, if not, raise error
+        if not os.path.exists(out_after_interrupt_path):
+            raise FileNotFoundError("Required file 'output.json' not found.")
+        
         with open(out_after_interrupt_path, "r") as f:
             out_after_interrupt = json.load(f)
 
         metadata_path = os.path.join(file_dir, "interrupt.json")
+        if not os.path.exists(metadata_path):
+            raise FileNotFoundError("Required file 'interrupt.json' not found.")
+
         # read the json file
         with open(metadata_path, "r") as f:
             metadata = json.load(f)
