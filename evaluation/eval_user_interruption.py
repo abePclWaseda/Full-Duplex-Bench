@@ -2,7 +2,7 @@ import json
 import re
 import os
 import argparse
-
+from tqdm import tqdm
 
 turn_duration_threshold = 1
 turn_num_words_threshold = 3
@@ -62,61 +62,23 @@ def eval_user_interruption(root_dir, client):
     take_turn_list = []
     latency_list = []
 
-    for file_dir in file_dirs:
+    for file_dir in tqdm(sorted(file_dirs)):
         # read the json file
         print(f"Processing {file_dir} ...")
 
         out_after_interrupt_path = os.path.join(file_dir, "output.json")
-        # check must have output.json, if not, raise error
-        if not os.path.exists(out_after_interrupt_path):
-            raise FileNotFoundError("Required file 'output.json' not found.")
-
         with open(out_after_interrupt_path, "r") as f:
             out_after_interrupt = json.load(f)
 
         metadata_path = os.path.join(file_dir, "interrupt.json")
-        if not os.path.exists(metadata_path):
-            raise FileNotFoundError("Required file 'interrupt.json' not found.")
-
         # read the json file
         with open(metadata_path, "r") as f:
             metadata = json.load(f)
-            metadata = metadata[0]
 
         in_interrupt_text = metadata[0]["interrupt"]
         in_before_interrupt_text = metadata[0]["context"]
         input_end_time = metadata[0]["timestamp"][1]
         out_after_interrupt_text = out_after_interrupt["text"]
-
-        user_msg = f"""
-       - Contextual user turn: {in_before_interrupt_text}
-       - User interrupting turn: {in_interrupt_text}
-       - AI's response: {out_after_interrupt_text}
-       """
-
-        messages = [
-            {"role": "system", "content": system_msg},
-            {"role": "user", "content": user_msg},
-        ]
-
-        response = client.chat.completions.create(
-            model=MODEL_NAME,
-            messages=messages,
-            seed=seed,
-        )
-
-        prediction = response.choices[0].message.content
-
-        print(prediction)
-        parsed_output = parse_output(prediction + "\n")
-
-        print(parsed_output)
-        score = parsed_output["rating"]
-        score_list.append(score)
-
-        # save the parsed_output to a json file
-        with open(os.path.join(file_dir, "rating.json"), "w") as f:
-            json.dump(parsed_output, f)
 
         # TOR and latency
         TOR = None
@@ -141,6 +103,42 @@ def eval_user_interruption(root_dir, client):
 
         take_turn_list.append(TOR)
         if TOR == 1:
+            user_msg = f"""
+            - Contextual user turn: {in_before_interrupt_text}
+            - User interrupting turn: {in_interrupt_text}
+            - AI's response: {out_after_interrupt_text}
+            """
+
+            messages = [
+                {"role": "system", "content": system_msg},
+                {"role": "user", "content": user_msg},
+            ]
+
+            response = client.chat.completions.create(
+                model=MODEL_NAME,
+                messages=messages,
+                seed=seed,
+            )
+
+            prediction = response.choices[0].message.content
+
+            print(prediction)
+            parsed_output = parse_output(prediction + "\n")
+
+            print(parsed_output)
+            score = parsed_output["rating"]
+            score_list.append(score)
+
+            # save the parsed_output to a json file
+            with open(os.path.join(file_dir, "rating.json"), "w") as f:
+                json.dump(parsed_output, f)
+            
+            # # read the json file
+            # with open(os.path.join(file_dir, "rating.json"), "r") as f:
+            #     parsed_output = json.load(f)
+
+            score = parsed_output["rating"]
+            score_list.append(score)
             if latency < 0:
                 latency_list.append(0)
             elif latency >= 0:
