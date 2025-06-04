@@ -18,6 +18,8 @@ def eval_pause_handling(data_dir):
     for folder in os.listdir(data_dir):
         if folder.endswith(".DS_Store"):
             continue
+        if folder.endswith(".md"):
+            continue
 
         for file_o in os.listdir(os.path.join(data_dir, folder)):
             if file_o.endswith("output.json"):

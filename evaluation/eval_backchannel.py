@@ -130,7 +130,8 @@ def eval_backchannel(data_dir):
                 start = int(interval[0] / window_size)
                 end = int(interval[1] / window_size)
                 for i in range(start, end + 1):
-                    time_intervals[i] += 1
+                    if i < len(time_intervals):
+                        time_intervals[i] += 1
 
             # Normalize the time intervals
             time_intervals = np.array(time_intervals)

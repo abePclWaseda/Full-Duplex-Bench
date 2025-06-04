@@ -64,92 +64,99 @@ def eval_user_interruption(root_dir, client):
 
     for file_dir in tqdm(sorted(file_dirs)):
         # read the json file
-        print(f"Processing {file_dir} ...")
+        while True:
+            print(f"Processing {file_dir} ...")
 
-        out_after_interrupt_path = os.path.join(file_dir, "output.json")
-        # check must have output.json, if not, raise error
-        if not os.path.exists(out_after_interrupt_path):
-            raise FileNotFoundError("Required file 'output.json' not found.")
-        
-        with open(out_after_interrupt_path, "r") as f:
-            out_after_interrupt = json.load(f)
+            out_after_interrupt_path = os.path.join(file_dir, "output.json")
+            # check must have output.json, if not, raise error
+            if not os.path.exists(out_after_interrupt_path):
+                raise FileNotFoundError("Required file 'output.json' not found.")
 
-        metadata_path = os.path.join(file_dir, "interrupt.json")
-        if not os.path.exists(metadata_path):
-            raise FileNotFoundError("Required file 'interrupt.json' not found.")
+            with open(out_after_interrupt_path, "r") as f:
+                out_after_interrupt = json.load(f)
 
-        # read the json file
-        with open(metadata_path, "r") as f:
-            metadata = json.load(f)
+            metadata_path = os.path.join(file_dir, "interrupt.json")
+            if not os.path.exists(metadata_path):
+                raise FileNotFoundError("Required file 'interrupt.json' not found.")
 
-        in_interrupt_text = metadata[0]["interrupt"]
-        in_before_interrupt_text = metadata[0]["context"]
-        input_end_time = metadata[0]["timestamp"][1]
-        out_after_interrupt_text = out_after_interrupt["text"]
+            # read the json file
+            with open(metadata_path, "r") as f:
+                metadata = json.load(f)
 
-        # TOR and latency
-        TOR = None
-        latency = None
-        segments_cw = out_after_interrupt["chunks"]
+            in_interrupt_text = metadata[0]["interrupt"]
+            in_before_interrupt_text = metadata[0]["context"]
+            input_end_time = metadata[0]["timestamp"][1]
+            out_after_interrupt_text = out_after_interrupt["text"]
 
-        # if no transcription from CrisperWhisper， means model does not take turn
-        if len(segments_cw) == 0:
-            TOR = 0
-        else:
-            output_start_time = segments_cw[0]["timestamp"][0]
-            duration = segments_cw[-1]["timestamp"][-1] - segments_cw[0]["timestamp"][0]
-            if duration < turn_duration_threshold:
-                if len(segments_cw) <= turn_num_words_threshold:
-                    TOR = 0
+            # TOR and latency
+            TOR = None
+            latency = None
+            segments_cw = out_after_interrupt["chunks"]
+
+            # if no transcription from CrisperWhisper， means model does not take turn
+            if len(segments_cw) == 0:
+                TOR = 0
+            else:
+                output_start_time = segments_cw[0]["timestamp"][0]
+                duration = (
+                    segments_cw[-1]["timestamp"][-1] - segments_cw[0]["timestamp"][0]
+                )
+                if duration < turn_duration_threshold:
+                    if len(segments_cw) <= turn_num_words_threshold:
+                        TOR = 0
+                    else:
+                        TOR = 1
+                        latency = output_start_time - input_end_time
                 else:
                     TOR = 1
                     latency = output_start_time - input_end_time
-            else:
-                TOR = 1
-                latency = output_start_time - input_end_time
 
-        take_turn_list.append(TOR)
-        if TOR == 1:
-            user_msg = f"""
-            - Contextual user turn: {in_before_interrupt_text}
-            - User interrupting turn: {in_interrupt_text}
-            - AI's response: {out_after_interrupt_text}
-            """
+            take_turn_list.append(TOR)
+            if TOR == 1:
+                user_msg = f"""
+                - Contextual user turn: {in_before_interrupt_text}
+                - User interrupting turn: {in_interrupt_text}
+                - AI's response: {out_after_interrupt_text}
+                """
 
-            messages = [
-                {"role": "system", "content": system_msg},
-                {"role": "user", "content": user_msg},
-            ]
+                messages = [
+                    {"role": "system", "content": system_msg},
+                    {"role": "user", "content": user_msg},
+                ]
 
-            response = client.chat.completions.create(
-                model=MODEL_NAME,
-                messages=messages,
-                seed=seed,
-            )
+                response = client.chat.completions.create(
+                    model=MODEL_NAME,
+                    messages=messages,
+                    seed=seed,
+                )
 
-            prediction = response.choices[0].message.content
+                prediction = response.choices[0].message.content
 
-            print(prediction)
-            parsed_output = parse_output(prediction + "\n")
+                print(prediction)
+                parsed_output = parse_output(prediction + "\n")
 
-            print(parsed_output)
-            score = parsed_output["rating"]
-            score_list.append(score)
+                print(parsed_output)
+                if "rating" not in parsed_output:
+                    continue
+                score = parsed_output["rating"]
+                score_list.append(score)
 
-            # save the parsed_output to a json file
-            with open(os.path.join(file_dir, "rating.json"), "w") as f:
-                json.dump(parsed_output, f)
-            
-            # # read the json file
-            # with open(os.path.join(file_dir, "rating.json"), "r") as f:
-            #     parsed_output = json.load(f)
+                # save the parsed_output to a json file
+                with open(os.path.join(file_dir, "rating.json"), "w") as f:
+                    json.dump(parsed_output, f)
 
-            score = parsed_output["rating"]
-            score_list.append(score)
-            if latency < 0:
-                latency_list.append(0)
-            elif latency >= 0:
-                latency_list.append(latency)
+                # # read the json file
+                # with open(os.path.join(file_dir, "rating.json"), "r") as f:
+                #     parsed_output = json.load(f)
+
+                score = parsed_output["rating"]
+                score_list.append(score)
+                if latency < 0:
+                    latency_list.append(0)
+                elif latency >= 0:
+                    latency_list.append(latency)
+
+            break
 
     print("---------------------------------------------------")
     print("[Result]")

@@ -21,16 +21,70 @@ Full-Duplex-Bench provides an open and standardized benchmark to assess these in
 
 <div align="center"><img src="https://github.com/user-attachments/assets/e936d330-1105-42fc-b5c6-d7ee8f40d27c" width="65%"/></div>
 
-We will provide a set of curated datasets, automatic evaluation scripts, and baseline results on multiple full-duplex models in upcoming releases. Our benchmark aims to drive progress in spoken dialogue systems by encouraging fair and open evaluation practices. 
+We provide a set of curated datasets, automatic evaluation scripts, and baseline results on multiple full-duplex models in upcoming releases. Our benchmark aims to drive progress in spoken dialogue systems by encouraging fair and open evaluation practices. The audio demo samples can be found in [[Demo]](https://full-duplex-bench.github.io/).
 
-The audio demo samples can be found in [[Demo]](https://full-duplex-bench.github.io/).
-
-## Timeline ⏱
-- **(2025/4/30) Dataset Release:** ✅ see under the `dataset` folder
-- **(2025/4/30) Evaluation Codebase:** ✅ see under the `evaluation` folder
-- **(Ongoing) Expanded Model Evaluations & Community Contributions**
+## Change Log ⏱
+- **(2025/6/05) Paper & ASR Model Update**: Replaced the ASR model with nvidia/parakeet-tdt-0.6b-v2, which offers more reliable time-aligned transcriptions for evaluation purposes. The paper has been updated accordingly to reflect this change.
+- **(2025/4/30) Dataset Released:** see under the `dataset` folder.
+- **(2025/4/30) Evaluation Code Released:** see under the `evaluation` folder.
 
 Stay tuned for upcoming releases!
+
+## 📊 Evaluation Results
+
+<table>
+  <thead>
+    <tr>
+      <th rowspan="2">Model</th>
+      <th colspan="2" style="text-align:center">Pause Handling</th>
+      <th colspan="3" style="text-align:center">Backchannel</th>
+      <th colspan="2" style="text-align:center">Smooth Turn Taking</th>
+      <th colspan="3" style="text-align:center">User Interruption</th>
+    </tr>
+    <tr>
+      <th>Synthetic TOR ↓</th><th>Candor TOR ↓</th>
+      <th>TOR ↓</th><th>Freq ↑</th><th>JSD ↓</th>
+      <th>Candor TOR ↑</th><th>Latency ↓</th>
+      <th>TOR ↑</th><th>GPT-4o ↑</th><th>Latency ↓</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><b>dGSLM</b></td>
+      <td>0.934</td><td>0.935</td>
+      <td>0.691</td><td><b>0.015</b></td><td><b>0.934</b></td>
+      <td><b>0.975</b></td><td>0.352</td>
+      <td>0.917</td><td>0.201</td><td>2.531</td>
+    </tr>
+    <tr>
+      <td><b>Moshi</b></td>
+      <td>0.985</td><td>0.980</td>
+      <td>1.000</td><td>0.001</td><td>0.957</td>
+      <td>0.941</td><td><b>0.265</b></td>
+      <td><b>1.000</b></td><td>0.765</td><td><b>0.257</b></td>
+    </tr>
+    <tr>
+      <td><b>Freeze-Omni</b></td>
+      <td><b>0.642</b></td><td><b>0.481</b></td>
+      <td><b>0.636</b></td><td>0.001</td><td>0.997</td>
+      <td>0.336</td><td>0.953</td>
+      <td>0.867</td><td><b>3.615</b></td><td>1.409</td>
+    </tr>
+    <tr>
+      <td><i>Gemini Live</i></td>
+      <td><i>0.255</i></td><td><i>0.310</i></td>
+      <td><i>0.091</i></td><td><i>0.012</i></td><td><i>0.896</i></td>
+      <td><i>0.655</i></td><td><i>1.301</i></td>
+      <td><i>0.891</i></td><td><i>3.376</i></td><td><i>1.183</i></td>
+    </tr>
+  </tbody>
+</table>
+
+- **TOR**: Turn-Over Rate (↓: lower is better for Pause/Backchannel, ↑ for Smooth Turn/User Interruption)
+- **Freq**: Frequency of backchannels (↑ better)
+- **JSD**: Jensen-Shannon Divergence (↓ better)
+- **Latency**: Response latency (↓ better)
+- **GPT-4o**: GPT-4o-assessed contextual relevance (↑ better)
 
 ## Getting Started 🏁
 ### Installation

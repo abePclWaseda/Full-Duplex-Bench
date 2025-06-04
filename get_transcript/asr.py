@@ -1,110 +1,107 @@
 import os
 import json
-from datasets import Dataset
-from torch.utils.data import DataLoader
-import torch
-from glob import glob
-from transformers import AutoModelForSpeechSeq2Seq, AutoProcessor, pipeline
-from tqdm import tqdm
 import argparse
-from utils import adjust_pauses_for_hf_pipeline_output, load_audio, collate_fn
+from glob import glob
 
+import soundfile as sf
+import nemo.collections.asr as nemo_asr
+from tqdm import tqdm
 
-### REPLACE WITH YOUR OWN SETUP ###
-your_huggingface_token = "YOUR_HUGGINGFACE_TOKEN"
-###################################
+MODEL_NAME = ""
 
 
 def get_time_aligned_transcription(data_path, task):
-    # List of audio file paths
-    audio_paths = sorted(glob(f"{data_path}/*/output.wav"))
+    # Collect all output.wav files under the root directory
+    audio_paths = sorted(glob(f"{data_path}/*/{MODEL_NAME}output.wav"))
 
-    # Set device and torch_dtype based on availability
-    device = "cuda:0" if torch.cuda.is_available() else "cpu"
-    torch_dtype = torch.float16 if torch.cuda.is_available() else torch.float32
+    # Load the pretrained NeMo ASR model and move to GPU
+    asr_model = nemo_asr.models.ASRModel.from_pretrained(
+        model_name="nvidia/parakeet-tdt-0.6b-v2"
+    ).cuda()
 
-    model_id = "nyrahealth/CrisperWhisper"
-    model = AutoModelForSpeechSeq2Seq.from_pretrained(
-        model_id,
-        torch_dtype=torch_dtype,
-        low_cpu_mem_usage=True,
-        use_safetensors=True,
-        token=your_huggingface_token,
-        attn_implementation="eager",
-    )
-    model.to(device)
-    processor = AutoProcessor.from_pretrained(model_id)
+    for audio_path in tqdm(audio_paths):
+        print(audio_path)
+        # Read the audio file (waveform and sample rate)
+        waveform, sr = sf.read(audio_path)
+        # If multichannel audio, convert to mono by averaging channels
+        if waveform.ndim > 1:
+            waveform = waveform.mean(axis=1)
 
-    # Create the pipeline with an increased batch size
-    pipe = pipeline(
-        "automatic-speech-recognition",
-        model=model,
-        tokenizer=processor.tokenizer,
-        feature_extractor=processor.feature_extractor,
-        chunk_length_s=30,
-        batch_size=1,  # Increase batch size if memory allows
-        return_timestamps="word",
-        torch_dtype=torch_dtype,
-        device=device,
-    )
+        # Default offset is zero (no cropping)
+        offset = 0.0
 
-    # Create a dataset from the list of audio paths
-    data = [{"audio_path": path} for path in audio_paths]
-    print(len(data))
-    dataset = Dataset.from_list(data)
+        if task == "user_interruption":
+            # Load the interrupt metadata to get [start, end] timestamps
+            meta_path = audio_path.replace(f"{MODEL_NAME}output.wav", "interrupt.json")
+            with open(meta_path, "r") as f:
+                interrupt_meta = json.load(f)
 
-    # Apply preprocessing in parallel
-    dataset = dataset.map(load_audio, num_proc=4)
+            # We only care about the end of the interruption
+            _, end_interrupt = interrupt_meta[0]["timestamp"]
+            offset = end_interrupt
 
-    # Build the DataLoader for batching
-    dataloader = DataLoader(dataset, batch_size=1, num_workers=1, collate_fn=collate_fn, shuffle=False)
+            # Compute the sample index to start from, and crop the waveform
+            start_idx = int(end_interrupt * sr)
+            waveform = waveform[start_idx:]
 
-    # Process the dataset in batches
-    for pipeline_inputs, metadata in tqdm(dataloader):
-        try:
-            if task == "user_interruption":
-                # read the interrupt.json file
-                metadata_path = metadata[0].replace(
-                    "output.wav", "interrupt.json"
-                )
-                # read the json file
-                with open(metadata_path, "r") as f:
-                    interrupt_metadata = json.load(f)
-                timestamps = interrupt_metadata[0]["timestamp"]
-                end_interrupt = timestamps[1]
-                end_interrupt_idx = int(end_interrupt * pipeline_inputs[0]["sampling_rate"])
+        import tempfile
 
-                # truncate the audio to the start_interrupt till the end
-                pipeline_inputs[0]["array"] = pipeline_inputs[0]["array"][end_interrupt_idx:]
+        with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmp:
+            sf.write(tmp.name, waveform, sr)
+            # original file‐based API (this accepts timestamps=True)
+            asr_outputs = asr_model.transcribe([tmp.name], timestamps=True)
+        # remove the temp file so you don't leak disk
+        os.unlink(tmp.name)
 
-            # The pipeline now receives a list of dictionaries with only the required keys
-            hf_pipeline_outputs = pipe(pipeline_inputs)
+        # Take the first (and only) result
+        result = asr_outputs[0]
+        word_timestamps = result.timestamp["word"]
 
-            # If we did a user interruption, shift all returned timestamps by the offset
-            if task == "user_interruption":
-                for out in hf_pipeline_outputs:
-                    # shift each word‐level timestamp back to the original timeline
-                    for chunk in out.get("chunks", []):
-                        start, end = chunk["timestamp"]
-                        chunk["timestamp"] = (start + end_interrupt, end + end_interrupt)
+        # Build the output dict, adjusting each timestamp by the offset
+        chunks = []
+        text = ""
+        for w in word_timestamps:
+            start_time = w["start"] + offset
+            end_time = w["end"] + offset
+            word = w["word"]
 
-            # Iterate over outputs and corresponding metadata to save results
-            for audio_path, output in zip(metadata, hf_pipeline_outputs):
-                crisper_whisper_result = adjust_pauses_for_hf_pipeline_output(output)
-                print(crisper_whisper_result)
-                result_path = audio_path.replace("output.wav", "output.json")
-                print(result_path)
-                os.makedirs(os.path.dirname(result_path), exist_ok=True)
-                with open(result_path, "w") as f:
-                    json.dump(crisper_whisper_result, f, indent=4)
-        except Exception as e:
-            print(f"Error processing batch: {e}")
+            text += word + " "
+            chunks.append(
+                {
+                    "text": word,
+                    "timestamp": [start_time, end_time],
+                }
+            )
+
+        output_dict = {
+            "text": text.strip(),
+            "chunks": chunks,
+        }
+
+        # Write the JSON result next to the WAV file
+        result_path = audio_path.replace(f"{MODEL_NAME}output.wav", "output.json")
+        os.makedirs(os.path.dirname(result_path), exist_ok=True)
+        with open(result_path, "w") as f:
+            json.dump(output_dict, f, indent=4)
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="A simple argument parser")
-    parser.add_argument("--root_dir", type=str)
-    parser.add_argument("--task", type=str)
+    parser = argparse.ArgumentParser(
+        description="Transcribe full audio or only after a user interruption"
+    )
+    parser.add_argument(
+        "--root_dir",
+        type=str,
+        required=True,
+        help="Root folder containing subfolders with output.wav (and interrupt.json)",
+    )
+    parser.add_argument(
+        "--task",
+        type=str,
+        default="full",
+        choices=["full", "user_interruption"],
+        help="Choose 'full' for entire transcript or 'user_interruption' to crop before ASR",
+    )
     args = parser.parse_args()
 
     get_time_aligned_transcription(args.root_dir, args.task)
