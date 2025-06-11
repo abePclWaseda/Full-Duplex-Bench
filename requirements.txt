@@ -13,4 +13,4 @@ tqdm
 transformers
 pyyaml
 accelerate>=0.26.0
-nemo_toolkit["asr"]
+nemo_toolkit[asr]

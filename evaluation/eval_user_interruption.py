@@ -145,10 +145,6 @@ def eval_user_interruption(root_dir, client):
                 with open(os.path.join(file_dir, "rating.json"), "w") as f:
                     json.dump(parsed_output, f)
 
-                # # read the json file
-                # with open(os.path.join(file_dir, "rating.json"), "r") as f:
-                #     parsed_output = json.load(f)
-
                 score = parsed_output["rating"]
                 score_list.append(score)
                 if latency < 0:

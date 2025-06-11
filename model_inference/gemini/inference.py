@@ -24,9 +24,10 @@ from google.genai import types
 from glob import glob
 from tqdm import tqdm
 
-task = "synthetic_user_interruption"
+task = "user_interruption"
 
-root_dir = f"/data-full-duplex-bench-v1/{task}/"
+overwrite = True
+root_dir = f"/home/daniel094144/data-full-duplex-bench/v1/{task}/"
 root_file_dir = f"{root_dir}/*/input.wav"
 
 MODEL = "gemini-2.0-flash-live-001"
@@ -158,7 +159,6 @@ class Recorder:
             self.count += len(smp)
 
             if self.muted and self.queue.empty():
-                # 若在 muted 且 queue 空，睡一小段時間避免 busy-loop
                 await asyncio.sleep(self.tick_samples / self.out_sr)
 
         print("[DEBUG] Recorder: Playback and writing finished")
@@ -289,7 +289,7 @@ async def main(input_wav, output_wav):
         print(f"[ERROR] {input_wav} not found.")
         return False
 
-    if os.path.exists(output_wav):
+    if os.path.exists(output_wav) and not overwrite:
         print(f"[WARN] {output_wav} already exists. Skipping.")
         return True
 
