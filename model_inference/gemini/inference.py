@@ -258,7 +258,7 @@ async def run_session(
                     sc, "generation_complete", False
                 ):
                     print(
-                        f"[DEBUG][Session {session_id}] 收到 turn_complete/generation_complete → ending round"
+                        f"[DEBUG][Session {session_id}] turn_complete/generation_complete → ending round"
                     )
                     session_done = True
                     return

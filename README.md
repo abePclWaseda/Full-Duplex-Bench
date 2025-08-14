@@ -31,6 +31,7 @@ Spoken dialogue modeling presents unique challenges beyond text-based language m
 <div align="center"><img src="https://github.com/user-attachments/assets/b0f43c6e-18a5-4ca1-bceb-0ae285a8782d" width="60%"/></div>
 
 ## Change Log ⏱
+- **(2025/8/14) v1.5 Evaluation Code Release**: Added support for overlap handling with new metrics in Full-Duplex-Bench v1.5.
 - **(2025/6/05) Paper & ASR Model Update**: Replaced the ASR model with nvidia/parakeet-tdt-0.6b-v2, which offers more reliable time-aligned transcriptions for evaluation purposes. The paper has been updated accordingly to reflect this change.
 - **(2025/4/30) Dataset Released:** see under the `dataset` folder.
 - **(2025/4/30) Evaluation Code Released:** see under the `evaluation` folder.
@@ -97,7 +98,7 @@ Stay tuned for upcoming releases!
 ## Getting Started 🏁
 ### Installation
 ```
-conda create -n full-duplex-bench python=3.8
+conda create -n full-duplex-bench python=3.10
 conda activate full-duplex-bench
 pip install -r requirements.txt
 ```
