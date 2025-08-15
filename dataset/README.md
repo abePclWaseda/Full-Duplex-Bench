@@ -1,91 +1,159 @@
-# Evaluation Data of Full-Duplex-Bench 
+# Evaluation Data of Full-Duplex-Bench (v1.0 & v1.5)
 
 ## Data Access
 
-You can download the dataset from the following Google Drive link: [Dataset Download Link](https://drive.google.com/drive/folders/1DtoxMVO9_Y_nDs2peZtx3pw-U2qYgpd3?usp=sharing)
+You can download the dataset from the following Google Drive link:  
+[Dataset Download Link](https://drive.google.com/drive/folders/1DtoxMVO9_Y_nDs2peZtx3pw-U2qYgpd3?usp=sharing)
 
-## Overview of data 
+---
 
-| Dataset     | Task                  | # of Samples |
-|-------------|------------------------|--------------|
-| Candor      | Pause Handling         | 216          |
-| Candor      | Smooth Turn-Taking     | 119          |
-| ICC         | Backchannel            | 55           |
-| Synthetic   | User Interruption      | 200          |
-| Synthetic   | Pause Handling         | 137          |
+## Overview of Data
 
+### v1.0
+| Dataset   | Task                | # of Samples |
+|-----------|---------------------|--------------|
+| Candor    | Pause Handling      | 216          |
+| Candor    | Smooth Turn-Taking  | 119          |
+| ICC       | Backchannel         | 55           |
+| Synthetic | User Interruption   | 200          |
+| Synthetic | Pause Handling      | 137          |
+
+### v1.5
+| Subset             | Task                  | # of Samples |
+|--------------------|-----------------------|--------------|
+| user_interruption  | User Interruption     | 200          |
+| user_backchannel   | User Backchannel      | 99           |
+| talking_to_other   | Talking to Other      | 100          |
+| background_speech  | Background Speech     | 100          |
+
+---
 
 ## File Descriptions
 
-### The neccessary files for evaluation 🚨
-- **input.wav**: Audio stream of user speech, intended as model input.
-- **{TASK}.json**: Task-specific annotation files detailing "interrupt", "pause", or "turn_taking" labels.
+### v1.0 — Per-sample files
+Each sample folder in **v1.0** contains some of the following (task-dependent):
 
-### supplementary files
-- **transcription.json**: Contains the transcribed text of the input audio and word-level timing alignments.
+- **input.wav**: User speech input stream (the evaluation audio).
+- **{TASK}.json**: Task-specific annotation file (`pause.json`, `turn_taking.json`, or `interrupt.json`).
+- **transcription.json** *(if available)*: Text transcript with word-level timestamps.
+- **context.wav** *(only Synthetic User Interruption)*: Context audio preceding the interruption.
+- **interrupt.wav** *(only Synthetic User Interruption)*: The interruption audio segment.
 
-### Task-Specific Files ONLY for Synthetic User Interruption
-- **context.wav** *(only in synthetic_user_interruption)*: Audio providing context before the interruption event.
-- **interrupt.wav** *(only in synthetic_user_interruption)*: Audio segment representing the interruption.
+> **Note:** v1.0 focuses on natural conversations (Candor, ICC) and synthetic control sets with task annotations; it does **not** include paired “clean” vs. “overlap-removed” audio.
+
+---
+
+### v1.5 — Per-sample files
+Each sample folder in **v1.5** contains:
+
+- **input.wav**: User audio **with** an overlap event (e.g., interruption, background, or competing talk).
+- **clean_input.wav**: The corresponding user audio **without** the overlap event (non-overlap reference).
+- **metadata.json**: Minimal text metadata and overlap window.
+
+`metadata.json` example:
+```json
+{
+  "context_text": "What are some good places to visit in the city?",
+  "current_turn_text": "Oh, before I forget, could you also suggest some good restaurants nearby?",
+  "timestamps": [7.275, 11.467]
+}
+```
+- `context_text`: Prior conversational context.
+- `current_turn_text`: The current (focal) user turn that co-occurs with or surrounds the overlap.
+- `timestamps`: `[start, end]` (seconds) of the overlap event in `input.wav`.
+
+> **Note:** v1.5 provides controlled **paired** audios to isolate overlap effects during evaluation.
+
+---
 
 ## Dataset Structure
-The dataset includes five primary interaction tasks from Candor, ICC, and synthetic data:
-### Candor Pause Handling
+
+### v1.0
+
 ```
-candor_pause_handling/{ID}/
-├── input.wav                 # User speech input stream
-├── pause.json                # Annotations of pause events
-└── transcription.json        # Text and time-aligned transcription
+v1_0/
+├── candor_pause_handling/{ID}/
+│   ├── input.wav                 # User speech input stream
+│   ├── pause.json                # Annotations of pause events
+│   └── transcription.json        # Text and time-aligned transcription
+│
+├── candor_turn_taking/{ID}/
+│   ├── input.wav                 # User speech input stream
+│   ├── turn_taking.json          # Annotations of turn-taking events
+│   └── transcription.json        # Text and time-aligned transcription
+│
+├── icc_backchannel/{ID}/
+│   ├── input.wav                 # User speech input stream
+│   └── transcription.json        # Text and time-aligned transcription
+│
+├── synthetic_pause_handling/{ID}/
+│   ├── input.wav                 # User speech input stream
+│   ├── pause.json                # Annotations of synthetic pause events
+│   └── transcription.json        # Text and time-aligned transcription
+│
+└── synthetic_user_interruption/{ID}/
+    ├── input.wav                 # User speech input stream
+    ├── context.wav               # Context audio preceding interruption
+    ├── interrupt.wav             # Interruption audio segment
+    └── interrupt.json            # Annotations of interruption events
+
 ```
 
-### Candor Turn Taking
+---
+
+### v1.5
 ```
-candor_turn_taking/{ID}/
-├── input.wav                 # User speech input stream
-├── turn_taking.json          # Annotations of turn-taking events
-└── transcription.json        # Text and time-aligned transcription
+v1_5/
+├── user_interruption/{ID}/
+│   ├── input.wav             # With overlap event
+│   ├── clean_input.wav       # Non-overlap reference
+│   └── metadata.json         # {context_text, current_turn_text, timestamps}
+│
+├── user_backchannel/{ID}/
+│   ├── input.wav
+│   ├── clean_input.wav
+│   └── metadata.json
+│
+├── talking_to_other/{ID}/
+│   ├── input.wav
+│   ├── clean_input.wav
+│   └── metadata.json
+│
+└── background_speech/{ID}/
+    ├── input.wav
+    ├── clean_input.wav
+    └── metadata.json
 ```
 
-### ICC Backchannel
-```
-icc_backchannel/{ID}/
-├── input.wav                 # User speech input stream
-└── transcription.json        # Text and time-aligned transcription
-```
+---
 
-### Synthetic Pause Handling
-```
-synthetic_pause_handling/{ID}/
-├── input.wav                 # User speech input stream
-├── pause.json                # Annotations of synthetic pause events
-└── transcription.json        # Text and time-aligned transcription
-```
+## License
+### v1.0 data (Candor, ICC subsets)
+The datasets are selected from [Candor](https://www.science.org/doi/full/10.1126/sciadv.adf3197) and [ICC](https://aclanthology.org/2024.findings-emnlp.909/).  
+We release **v1.0** under the **Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)** license.  
+Please also respect the upstream licenses and terms of use of the source datasets.
 
-### Synthetic User Interruption
-```
-synthetic_user_interruption/{ID}/
-├── input.wav                 # User speech input stream
-├── context.wav               # Contextual audio preceding interruption
-├── interrupt.wav             # Interruption audio segment
-└── interrupt.json            # Annotations of interruption events
-```
+### v1.0 (Synthetic subsets) & v1.5 data 
+The synthetic data is generated by us and released under the **MIT License**.
 
 
-## License 
-The datasets are selected from [Candor](https://www.science.org/doi/full/10.1126/sciadv.adf3197) and [ICC](https://aclanthology.org/2024.findings-emnlp.909/). We continue to release this dataset under the Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0) license.
 
-## Citation 
+## Citation
 If you use this dataset, please cite it accordingly.
 
 ```
-@misc{lin2025fullduplexbenchbenchmarkevaluatefullduplex,
-      title={Full-Duplex-Bench: A Benchmark to Evaluate Full-duplex Spoken Dialogue Models on Turn-taking Capabilities}, 
-      author={Guan-Ting Lin and Jiachen Lian and Tingle Li and Qirui Wang and Gopala Anumanchipalli and Alexander H. Liu and Hung-yi Lee},
-      year={2025},
-      eprint={2503.04721},
-      archivePrefix={arXiv},
-      primaryClass={cs.CL},
-      url={https://arxiv.org/abs/2503.04721}, 
+@article{lin2025full,
+  title={Full-duplex-bench: A benchmark to evaluate full-duplex spoken dialogue models on turn-taking capabilities},
+  author={Lin, Guan-Ting and Lian, Jiachen and Li, Tingle and Wang, Qirui and Anumanchipalli, Gopala and Liu, Alexander H and Lee, Hung-yi},
+  journal={arXiv preprint arXiv:2503.04721},
+  year={2025}
+}
+
+@article{lin2025full,
+  title={Full-Duplex-Bench v1.5: Evaluating Overlap Handling for Full-Duplex Speech Models},
+  author={Lin, Guan-Ting and Kuan, Shih-Yun Shan and Wang, Qirui and Lian, Jiachen and Li, Tingle and Lee, Hung-yi},
+  journal={arXiv preprint arXiv:2507.23159},
+  year={2025}
 }
 
 @article{reece2023candor,
@@ -100,22 +168,15 @@ If you use this dataset, please cite it accordingly.
 }
 
 @inproceedings{umair-etal-2024-large,
-    title = "Large Language Models Know What To Say But Not When To Speak",
-    author = "Umair, Muhammad  and
-      Sarathy, Vasanth  and
-      Ruiter, Jan",
-    editor = "Al-Onaizan, Yaser  and
-      Bansal, Mohit  and
-      Chen, Yun-Nung",
-    booktitle = "Findings of the Association for Computational Linguistics: EMNLP 2024",
-    month = nov,
-    year = "2024",
-    address = "Miami, Florida, USA",
-    publisher = "Association for Computational Linguistics",
-    url = "https://aclanthology.org/2024.findings-emnlp.909/",
-    doi = "10.18653/v1/2024.findings-emnlp.909",
-    pages = "15503--15514",
+  title = {Large Language Models Know What To Say But Not When To Speak},
+  author = {Umair, Muhammad and Sarathy, Vasanth and Ruiter, Jan},
+  booktitle = {Findings of the Association for Computational Linguistics: EMNLP 2024},
+  month = nov,
+  year = {2024},
+  address = {Miami, Florida, USA},
+  publisher = {Association for Computational Linguistics},
+  url = {https://aclanthology.org/2024.findings-emnlp.909/},
+  doi = {10.18653/v1/2024.findings-emnlp.909},
+  pages = {15503--15514}
 }
-
 ```
-
