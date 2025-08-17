@@ -39,6 +39,16 @@ Spoken dialogue modeling presents unique challenges beyond text-based language m
 
 Stay tuned for upcoming releases!
 
+## Repository Structure 📂
+
+This repository is organized into three main components. Please refer to the respective folders for details:
+
+- [`dataset/`](./dataset): Dataset release and detailed description of v1.0 and v1.5 benchmark data.  
+- [`evaluation/`](./evaluation): Evaluation code for running benchmark tasks and metrics.  
+- [`model_inference/`](./model_inference): Server–client inference setup for running full-duplex models in a streaming manner.  
+
+Each subfolder contains its own README with more detailed instructions.
+
 ## 📊 Evaluation Results 
 
 ### Full-Duplex-Bench (v1.0)
