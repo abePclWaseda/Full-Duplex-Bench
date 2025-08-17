@@ -50,7 +50,7 @@ CONFIG = {
     "speech_config": {
         "voice_config": {"prebuilt_voice_config": {"voice_name": "Puck"}}
     },
-    "system_instruction": "You are a helpful assistant. Answer the user query in detail. You can reply with multiple sentences.",
+    "system_instruction": "You are a helpful assistant.",
     "realtime_input_config": {"automatic_activity_detection": {"disabled": False}},
 }
 # ─────────────────────────────────────────────────
