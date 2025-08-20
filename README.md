@@ -6,19 +6,23 @@
 ## TL;DR
 Benchmark for full-duplex spoken dialogue models — v1.0 evaluates turn-taking, v1.5 adds overlap handling with richer metrics.
 
-[![arXiv](https://img.shields.io/badge/arXiv-2409.06666-b31b1b.svg?logo=arXiv)]((https://arxiv.org/abs/2503.04721))
-[![arXiv](https://img.shields.io/badge/arXiv-2409.06666-b31b1b.svg?logo=arXiv)]((https://arxiv.org/abs/2507.23159))
+[![arXiv](https://img.shields.io/badge/arXiv-2409.06666-b31b1b.svg?logo=arXiv)](https://arxiv.org/abs/2503.04721)
+[![arXiv](https://img.shields.io/badge/arXiv-2409.06666-b31b1b.svg?logo=arXiv)](https://arxiv.org/abs/2507.23159)
 [![code](https://img.shields.io/badge/Github-Code-keygen.svg?logo=github)](https://github.com/DanielLin94144/Full-Duplex-Bench)
 
+## News 🔥
+- **(2025/8/15) v1.5 Data Release**: Added v1.5 dataset with overlap scenarios and metadata annotations.
+- **(2025/8/14) v1.5 Evaluation Code Release**: Added support for overlap handling with new metrics in Full-Duplex-Bench v1.5.
+- **(2025/6/05) Paper & ASR Model Update**: Replaced the ASR model with nvidia/parakeet-tdt-0.6b-v2, which offers more reliable time-aligned transcriptions for evaluation purposes. The paper has been updated accordingly to reflect this change.
+- **(2025/4/30) Dataset Released:** see under the `dataset` folder.
+- **(2025/4/30) Evaluation Code Released:** see under the `evaluation` folder.
+> Stay tuned for upcoming releases!
 
-## Highlight 💡
-Spoken dialogue modeling presents unique challenges beyond text-based language modeling, requiring real-time interaction capabilities such as turn-taking, backchanneling, and pause handling. Existing evaluation methods primarily focus on half-duplex processing, leaving the full-duplex capabilities of modern models underexplored. 
-
+## Highlights 💡
 ### Full-Duplex-Bench (v1.0)
 - Provides an open and standardized benchmark to assess interactive behaviors systematically.
 - Evaluates four key turn-taking dimensions: Pause Handling, Backchanneling, Smooth Turn-Taking, and User Interruption Management.
 - Leverages automatic metrics for reproducible evaluation across models.
-
 <div align="center"><img src="https://github.com/user-attachments/assets/70b6525c-61ee-4c48-a1fb-59dc6dfe85cc" width="80%"/></div>
 <div align="center"><img src="https://github.com/user-attachments/assets/e936d330-1105-42fc-b5c6-d7ee8f40d27c" width="60%"/></div>
 
@@ -26,18 +30,9 @@ Spoken dialogue modeling presents unique challenges beyond text-based language m
 - Extends the benchmark with four simulated overlap scenarios: user interruption, listener backchannel, side conversation, and ambient speech.
 - Supports both open-sourced and commercial models.
 - Introduces a comprehensive metric suite — categorical dialogue behaviors, stop and response latency, prosodic adaptation, and perceived speech quality — customizable to application needs.
-
 <div align="center"><img src="https://github.com/user-attachments/assets/969853c2-885f-40f1-bf7b-0c4da0e2fab4" width="75%"/></div>
 <div align="center"><img src="https://github.com/user-attachments/assets/b0f43c6e-18a5-4ca1-bceb-0ae285a8782d" width="60%"/></div>
 
-## Change Log ⏱
-- **(2025/8/15) v1.5 Data Release**: Added v1.5 dataset with overlap scenarios and metadata annotations.
-- **(2025/8/14) v1.5 Evaluation Code Release**: Added support for overlap handling with new metrics in Full-Duplex-Bench v1.5.
-- **(2025/6/05) Paper & ASR Model Update**: Replaced the ASR model with nvidia/parakeet-tdt-0.6b-v2, which offers more reliable time-aligned transcriptions for evaluation purposes. The paper has been updated accordingly to reflect this change.
-- **(2025/4/30) Dataset Released:** see under the `dataset` folder.
-- **(2025/4/30) Evaluation Code Released:** see under the `evaluation` folder.
-
-Stay tuned for upcoming releases!
 
 ## Repository Structure 📂
 
