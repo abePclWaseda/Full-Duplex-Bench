@@ -13,7 +13,7 @@ The following models are included, each in its own subfolder:
 - **Gemini** — [Google DeepMind Gemini](https://deepmind.google/technologies/gemini/)  
 - **GPT-4o** — [OpenAI GPT-4o](https://openai.com/index/hello-gpt-4o/)  
 - **Moshi** — [Kyutai Labs Moshi](https://github.com/kyutai-labs/moshi)  
-- **Sonic** — [Amazon Nova-Sonic (Bedrock)](https://aws.amazon.com/bedrock/)  
+- **Sonic** — [Amazon Nova Sonic](https://aws.amazon.com/bedrock/)  
 
 Each subfolder contains:
 - Setup instructions  

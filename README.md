@@ -11,15 +11,16 @@ Benchmark for full-duplex spoken dialogue models — v1.0 evaluates turn-taking,
 [![code](https://img.shields.io/badge/Github-Code-keygen.svg?logo=github)](https://github.com/DanielLin94144/Full-Duplex-Bench)
 
 ## News 🔥
-- **(2025/8/15) v1.5 Data Release**: Added v1.5 dataset with overlap scenarios and metadata annotations.
-- **(2025/8/14) v1.5 Evaluation Code Release**: Added support for overlap handling with new metrics in Full-Duplex-Bench v1.5.
+- **(2025/8/22) v1.5 Server-client Model inference Code Release**: Added server-client inference scripts under [`model_inference/`](./model_inference).
+- **(2025/8/15) v1.5 Data Release**: Added v1.5 dataset with overlap scenarios and metadata annotations under [`dataset/`](./dataset).
+- **(2025/8/14) v1.5 Evaluation Code Release**: Added support for overlap handling with new metrics in Full-Duplex-Bench v1.5 under [`evaluation/`](./evaluation).
 - **(2025/6/05) Paper & ASR Model Update**: Replaced the ASR model with nvidia/parakeet-tdt-0.6b-v2, which offers more reliable time-aligned transcriptions for evaluation purposes. The paper has been updated accordingly to reflect this change.
-- **(2025/4/30) Dataset Released:** see under the `dataset` folder.
-- **(2025/4/30) Evaluation Code Released:** see under the `evaluation` folder.
+- **(2025/4/30) Dataset Released:** see under the [`dataset/`](./dataset) folder.
+- **(2025/4/30) Evaluation Code Released:** see under the [`evaluation/`](./evaluation) folder.
 > Stay tuned for upcoming releases!
 
 ## Highlights 💡
-### Full-Duplex-Bench (v1.0)
+### Full-Duplex-Bench v1.0
 - Provides an open and standardized benchmark to assess interactive behaviors systematically.
 - Evaluates four key turn-taking dimensions: Pause Handling, Backchanneling, Smooth Turn-Taking, and User Interruption Management.
 - Leverages automatic metrics for reproducible evaluation across models.
