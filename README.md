@@ -115,6 +115,9 @@ pip install -r requirements.txt
 The goal of model inference is to let the model generate the time-synchronous `output.wav` given the audio stream of user speech (`input.wav`). You can use you own model to generate the output speech for evaluation.
 
 We will provide the example inference code of Freeze-omni under `model_inference/freeze-omni` for different tasks. 
+##### ⚠️ Issue
+We have observed the same issue and suspect it is due to recent internal changes in **Gemini**.  
+We are investigating and will share updates once a solution is found.
 
 #### 2. Prepare for Evaluation with time-aligned transcription
 Under `get_transcript` folder, you can find `asr.py` to obtain the time-aligned transcription for the model generated audio. For more details please see the readme in the folder.
