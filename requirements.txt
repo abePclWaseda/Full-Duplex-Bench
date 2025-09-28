@@ -7,8 +7,8 @@ openai
 scipy
 silero_vad
 soundfile
-torch
-torchaudio
+# torch
+# torchaudio
 tqdm
 transformers
 pyyaml
