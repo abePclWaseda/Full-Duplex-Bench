@@ -7,7 +7,7 @@
 #PBS -j oe
 #PBS -N 0162_full_duplex_bench
 
-ROOT_DIR="dataset/J-CHAT"
+ROOT_DIR="dataset"
 TASK="full"  # full | user_interruption
 
 set -eu
